@@ -18,7 +18,12 @@ Claude Code 是 Anthropic 推出的一种面向开发者的 AI 编程工具 / Ag
 ### 前置条件
 
 1. 安装 VS Code 编辑器
+
+https://code.visualstudio.com/
+
 2. 获取 DeepSeek API 密钥
+
+https://platform.deepseek.com/api_keys
 
 ### 安装步骤
 
@@ -90,7 +95,12 @@ Claude Code 是 Anthropic 推出的一种面向开发者的 AI 编程工具 / Ag
 ### 前置条件
 
 1. Node.js 18.0 或更高版本
+
+https://nodejs.org/en
+
 2. 获取 DeepSeek API 密钥
+
+https://platform.deepseek.com/api_keys
 
 ### 安装步骤
 
