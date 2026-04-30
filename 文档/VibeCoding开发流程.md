@@ -1,0 +1,527 @@
+
+
+
+# 能力边界
+## 支持能力
+代码生成, 文档编写, 测试用例生成, 代码审查辅助
+
+## 不支持能力
+替代人工决策, 替代架构设计, 替代需求分析
+
+## 落地步骤
+先建立约束, 再让AI写代码
+
+# 全新项目的流程
+
+以一个叫做 TimeLab 的 C# WPF 项目为例, 该项目主要是实现 ToDoList + 番茄钟 的一个项目.
+
+## 前置条件
+* 确保ClaudeCode完成安装, 且可运行
+* 确保安装Vs2026, 且安装 ".NET 桌面开发" 整套组件
+
+## 1. 确定项目的MVP
+
+> MVP: Minimum Viable Product 最小可行产品
+
+例如:
+```
+TimeLab MVP
+1. TodoList：创建 / 完成 / 删除任务
+2. Pomodoro：开始 / 暂停 / 结束专注
+3. SessionLog：一次专注结束后记录到历史
+```
+
+## 2. 建立项目结构
+
+```
+TimeLab/
+├─ src/ # 该目录可以不用创建, 通过Prompt告诉AI由AI创建
+|  ├─ TimeLab.sln
+│  ├─ TimeLab.App/              # WPF 启动项目
+│  ├─ TimeLab.Core/             # 领域模型
+│  ├─ TimeLab.Application/      # 用例服务
+│  └─ TimeLab.Infrastructure/   # 本地存储、日志、配置
+├─ docs/
+│  ├─ mvp.md           # 最小可行产品文档, 限制“做到哪一步”
+│  ├─ product.md       # 产品定义文档, 定义“是什么”
+│  ├─ architecture.md  # 架构文档, 限制“怎么实现”
+│  └─ workflow.md      # 工作流文档, 限制“先后顺序”
+└─ CLAUDE.md        # 持久化的系统级 Prompt
+```
+
+## 3. 编写给AI看的文档
+
+### CLAUDE.md 文件内容
+
+```markdown
+# CLAUDE.md
+
+## 项目说明
+
+你正在开发 TimeLab，一个简单的 WPF 应用，包含以下功能：
+
+* Todo 列表
+* 番茄钟计时器
+* 专注记录（Session Log）
+
+这是一个 MVP 项目，目标是保持简单和清晰，不做复杂设计。
+
+---
+
+## 技术栈
+
+* 语言：C#
+* UI：WPF
+* 架构：MVVM
+* 存储：JSON（当前不使用数据库）
+
+---
+
+## 架构规则
+
+分层结构：
+
+* TimeLab.App：UI 层（WPF + ViewModel）
+* TimeLab.Application：应用服务层
+* TimeLab.Core：领域模型层
+* TimeLab.Infrastructure：数据存储层
+
+依赖关系：
+
+* App → Application, Infrastructure
+* Application → Core
+* Infrastructure → Application, Core
+* Core → 不允许依赖任何层
+
+禁止违反依赖方向。
+
+---
+
+## 限制
+
+* 不要实现未要求的功能
+* 不要引入新的框架或第三方库
+* 不要修改无关代码
+* 不要移动文件结构
+* 不要在 View 中编写业务逻辑
+
+---
+
+## 编码原则
+
+* 保持代码简单清晰
+* 使用明确的命名
+* 避免过度设计
+* 类和方法尽量小
+
+---
+
+## 工作流程
+
+每次必须按以下步骤执行：
+
+1. 先说明将要做的内容
+2. 只实现当前要求的功能
+3. 不修改其他模块
+4. 最后总结改动
+
+---
+
+## 当前目标
+
+按顺序完成 MVP：
+
+1. 项目脚手架
+2. Core 模型
+3. Application 服务
+4. Infrastructure（JSON 存储）
+5. UI
+
+不允许跳步骤。
+
+---
+
+## 行为规则
+
+* 如果需求不清楚，先提问
+* 如果任务过大，拆分为小任务
+* 优先保证正确性，而不是完整性
+
+---
+
+## 完成标准
+
+任务完成必须满足：
+
+* 能正常编译
+* 无明显错误
+* 符合当前需求
+* 没有引入额外改动
+```
+
+### mvp.md 文件内容
+```markdown
+# MVP
+
+## Scope
+
+### Todo
+
+* 创建任务
+* 标记完成
+* 删除任务
+
+### Timer
+
+* 开始计时
+* 暂停计时
+* 停止计时
+
+### Session Log
+
+* 计时结束后记录 Session
+* 保存开始时间、结束时间、时长
+
+---
+
+## Out of Scope
+
+* 任务优先级
+* 分类 / 标签
+* 数据统计图表
+* AI 分析
+* 云同步
+```
+
+### product.md 文件内容
+```markdown
+# Product
+
+## Overview
+
+TimeLab 是一个用于记录和管理时间的工具。
+
+它提供：
+
+* Todo 列表（任务管理）
+* 番茄钟（专注计时）
+* Session Log（专注记录）
+
+---
+
+## Goals
+
+* 帮助用户记录时间使用情况
+* 提供简单的专注工具
+* 为后续数据分析提供基础
+
+---
+
+## Non-Goals
+
+* 不做复杂任务管理（如子任务、优先级系统）
+* 不做团队协作
+* 不做复杂统计分析（当前阶段）
+
+---
+
+## Core Concepts
+
+* Task：任务
+* Timer：计时器
+* Session：一次专注记录
+```
+
+### architecture.md 文件内容
+```markdown
+# Architecture
+
+## Layers
+
+* TimeLab.App：UI 层 WPF + ViewModel (WPF 应用)
+* TimeLab.Application：应用服务层
+* TimeLab.Core：领域模型
+* TimeLab.Infrastructure：数据存储
+
+---
+
+## Dependency Rules
+
+* App → Application, Infrastructure
+* Application → Core
+* Infrastructure → Application, Core
+* Core → 无依赖
+
+---
+
+## Responsibilities
+
+### Core
+
+* 定义领域模型（Task, Session, TimerState）
+
+### Application
+
+* 处理业务逻辑（TaskService, TimerService）
+
+### Infrastructure
+
+* 数据持久化(JSON 文件)
+
+### App
+
+* UI 展示
+* ViewModel
+* 用户交互
+```
+
+### workflow.md 文件内容
+```markdown
+# Workflow
+
+## Step 1: Scaffold
+
+* 创建项目结构
+* 创建解决方案和项目
+* 配置依赖关系
+
+---
+
+## Step 2: Core
+
+* 实现 Task 模型
+* 实现 Session 模型
+* 实现 Timer 状态
+
+---
+
+## Step 3: Application
+
+* 实现 TaskService
+* 实现 TimerService
+
+---
+
+## Step 4: Infrastructure
+
+* 使用 JSON 实现数据存储
+
+---
+
+## Step 5: UI
+
+* 实现 WPF 界面
+* 绑定 ViewModel
+
+---
+
+## Rule
+
+必须按顺序完成，不允许跳步骤。
+```
+
+## 4. 创建脚手架
+
+提交以下 Prompt:
+
+```prompt
+请先阅读 CLAUDE.md 和 docs/ 下的所有文档。
+
+现在只做项目脚手架：
+1. 创建 src/ 目录
+2. 创建 TimeLab.slnx
+3. 创建以下项目：
+   - TimeLab.App：WPF 应用
+   - TimeLab.Core：类库
+   - TimeLab.Application：类库
+   - TimeLab.Infrastructure：类库
+4. 配置项目引用：
+   - TimeLab.App 引用 TimeLab.Application 和 TimeLab.Infrastructure
+   - TimeLab.Application 引用 TimeLab.Core
+   - TimeLab.Infrastructure 引用 TimeLab.Application 和 TimeLab.Core
+5. 不实现任何业务功能
+6. 完成后说明你创建了哪些文件和引用关系
+```
+
+## 5. 创建领域模型
+
+提交以下 Prompt:
+
+```prompt
+请阅读 CLAUDE.md 和 docs/architecture.md。
+
+现在实现 Core 层的领域模型。
+
+要求：
+
+1. 在 TimeLab.Core 项目中创建以下类：
+   - TaskItem
+   - PomodoroSession
+   - TimerState
+   - TimerStatus enum
+
+2. 规则：
+   - 不依赖 WPF
+   - 不使用数据库
+   - 使用 Guid 作为 Id
+   - 使用 DateTime 表示时间
+
+3. 字段要求：
+
+TaskItem：
+- Id
+- Title
+- IsCompleted
+- CreatedAt
+- CompletedAt
+
+PomodoroSession：
+- Id
+- TaskId（可为空）
+- StartTime
+- EndTime
+- Duration
+- Note（可选）
+
+TimerState：
+- Status（TimerStatus）
+- StartTime
+- ElapsedTime
+
+4. 保持实现简单，不要添加额外逻辑
+
+5. 完成后说明你创建了哪些类和字段
+```
+
+## 6. 实现Application层
+
+提交以下 Prompt:
+
+```
+请阅读 CLAUDE.md 和 docs/ 下的所有文档。
+
+现在只实现 TimeLab.Application 层。
+
+要求：
+
+1. 创建仓储接口：
+   - ITaskRepository
+   - ISessionRepository
+
+2. 创建应用服务：
+   - TaskService
+   - PomodoroService
+
+3. ITaskRepository 需要支持：
+   - GetAllAsync
+   - AddAsync
+   - UpdateAsync
+   - DeleteAsync
+
+4. ISessionRepository 需要支持：
+   - GetAllAsync
+   - AddAsync
+
+5. TaskService 需要支持：
+   - 创建任务
+   - 获取所有任务
+   - 完成任务
+   - 删除任务
+
+6. PomodoroService 需要支持：
+   - 开始专注
+   - 暂停专注
+   - 停止专注并生成 PomodoroSession
+
+规则：
+- 不实现 JSON 存储
+- 不实现 UI
+- 不引用 WPF
+- 只依赖 TimeLab.Core
+- 保持简单
+- 不添加额外功能
+
+完成后说明创建了哪些接口、服务和方法。
+```
+
+## 7. 实现Infrastructure层
+
+提交以下Prompt:
+
+```prompt
+请阅读 CLAUDE.md 和 docs/ 下的所有文档。
+
+现在只实现 TimeLab.Infrastructure 层。
+
+要求：
+
+1. 实现以下仓储接口：
+   - ITaskRepository
+   - ISessionRepository
+
+2. 创建 JSON 实现：
+   - JsonTaskRepository
+   - JsonSessionRepository
+
+3. 数据存储规则：
+   - 使用 System.Text.Json
+   - 数据保存到用户 AppData/TimeLab/
+   - 任务保存到 tasks.json
+   - 专注记录保存到 sessions.json
+   - 如果目录或文件不存在，自动创建
+
+4. 规则：
+   - 不实现 UI
+   - 不修改 Core 模型
+   - 不修改 Application 服务逻辑
+   - 不引入数据库
+   - 不引入第三方库
+   - 保持简单
+
+完成后说明创建了哪些文件，以及数据保存路径。
+```
+
+## 8. 实现Presentation (WPF UI + ViewModel)
+
+提交以下Prompt:
+
+```prompt
+请阅读 CLAUDE.md 和 docs/ 下的所有文档。
+
+现在只实现 TimeLab.App 的基础 UI 和 ViewModel。
+
+要求：
+
+1. 创建 MainViewModel
+2. 使用 TaskService 和 PomodoroService
+3. 实现基础界面：
+   - 左侧：Todo 列表
+   - 右侧上方：番茄钟
+   - 右侧下方：Session Log
+
+4. Todo 功能：
+   - 显示任务列表
+   - 添加任务
+   - 完成任务
+   - 删除任务
+
+5. Timer 功能：
+   - 显示当前计时状态
+   - 开始
+   - 暂停
+   - 停止
+
+6. Session Log：
+   - 显示已记录的专注记录
+
+规则：
+- 使用 MVVM
+- 不在 View 里写业务逻辑
+- 不修改 Core 模型
+- 不修改 Infrastructure
+- 不引入第三方 UI 库
+- 保持简单，先能运行
+
+完成后说明创建或修改了哪些文件。
+```
+
