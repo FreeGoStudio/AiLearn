@@ -572,4 +572,97 @@ TimerState：
 
 按以上的方式修复完发现的问题后, 之后再做优化.
 
-## 10. 
+## 10. 编写项目的最小说明文档
+> 对项目进行少量的说明, 防止今天后忘记该项目是什么
+
+### 编写 README.md 项目入口文档
+> 对项目的简单说明
+
+放在项目根目录
+```markdown
+# TimeLab
+
+TimeLab 是一个简单的时间管理工具，包含：
+
+* Todo 列表
+* 番茄钟
+* 专注记录（Session Log）
+
+---
+
+## 技术栈
+
+* C#
+* WPF
+* MVVM
+* JSON 本地存储
+
+---
+
+## 功能
+
+### Todo
+
+* 创建任务
+* 完成任务
+* 删除任务
+
+### Timer
+
+* 开始 / 暂停 / 停止
+
+### Session Log
+
+* 自动记录专注时间
+
+---
+
+## 运行方式
+
+1. 打开 TimeLab.sln
+2. 运行 TimeLab.App
+
+---
+
+## 项目结构
+
+* TimeLab.App：UI 层
+* TimeLab.Application：业务逻辑
+* TimeLab.Core：领域模型
+* TimeLab.Infrastructure：数据存储
+```
+
+### 编写 status.md 项目的状态文档
+> 对项目当前完成状态的说明
+
+为了解决之后需要重新读代码才能知道现在项目做了什么, 有什么问题, 接下来要做什么
+
+放在 docs/status.md
+
+```markdown
+# Current Status
+
+已完成：
+
+* 项目脚手架
+* Core 模型
+* Application 服务
+* Infrastructure（JSON）
+* 基础 UI
+* MVP 功能跑通
+* Bug 修复
+
+当前状态：
+
+* MVP 可运行
+* 功能完整
+* 无严重错误
+
+下一步计划：
+
+* UI 简化
+* 体验优化
+* AI Insight 原型
+
+```
+
