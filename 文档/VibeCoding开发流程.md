@@ -13,10 +13,11 @@
 
 # 全新项目的流程
 
-以一个叫做 TimeLab 的 C# WPF 项目为例, 该项目主要是实现 ToDoList + 番茄钟 的一个项目.
+以一个 TimeLab 的 C# WPF 项目为例, 该项目主要是实现 ToDoList + 番茄钟 的一个项目.
 
 ## 前置条件
 * 确保ClaudeCode完成安装, 且可运行
+* 配置ClaudeCode, 使用DeepSeek v4 pro模型
 * 确保安装Vs2026, 且安装 ".NET 桌面开发" 整套组件
 
 ## 1. 确定项目的MVP
